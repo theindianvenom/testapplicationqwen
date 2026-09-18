@@ -489,6 +489,9 @@ export default function App() {
           <p className="text-gray-500 text-sm">
             Built with React, Vite & Tailwind CSS • Showcasing Qwen AI Capabilities
           </p>
+          <p className="text-gray-600 text-xs mt-2">
+            💡 Want to run without installing anything? Open <code className="bg-white/10 px-2 py-0.5 rounded text-purple-300">public/standalone.html</code> directly in your browser!
+          </p>
           <div className="flex items-center justify-center gap-4 mt-4">
             <span className="text-gray-600 text-xs">© 2026 Qwen Capabilities Demo</span>
           </div>
