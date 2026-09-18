@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qwen AI Capabilities Showcase</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-20px) translateX(10px); }
+      50% { transform: translateY(-10px) translateX(-10px); }
+      75% { transform: translateY(-30px) translateX(5px); }
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      opacity: 0.15; pointer-events: none; animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 400px; height: 400px; background: #9333ea; top: 10%; left: 5%; }
+    .orb-2 { width: 300px; height: 300px; background: #2563eb; top: 40%; left: 60%; animation-delay: 2s; }
+    .orb-3 { width: 350px; height: 350px; background: #ec4899; top: 70%; left: 20%; animation-delay: 4s; }
+    .orb-4 { width: 250px; height: 250px; background: #06b6d4; top: 20%; left: 75%; animation-delay: 1s; }
+    .orb-5 { width: 280px; height: 280px; background: #6366f1; top: 60%; left: 40%; animation-delay: 3s; }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(ellipse at center, transparent 20%, #0a0a0f 80%); pointer-events: none; }
+
+    .container { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+    .header { padding: 4rem 1rem 3rem; text-align: center; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; backdrop-filter: blur(8px); }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 2s ease-in-out infinite; }
+    .badge-text { font-size: 0.875rem; color: #d1d5db; }
+    .title { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; margin-bottom: 1rem; background: linear-gradient(to right, #fff, #e9d5ff, #bfdbfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { font-size: clamp(1.1rem, 3vw, 1.5rem); color: #9ca3af; max-width: 600px; margin: 0 auto 0.5rem; }
+    .subtitle-small { font-size: 0.875rem; color: #6b7280; max-width: 500px; margin: 0 auto; }
+
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding: 1.5rem; border-radius: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(8px); margin-bottom: 4rem; }
+    @media (min-width: 768px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stat-number { font-size: clamp(1.5rem, 4vw, 2.25rem); font-weight: 700; }
+    .stat-label { font-size: 0.8rem; color: #9ca3af; margin-top: 0.25rem; }
+
+    .capabilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+    @media (min-width: 640px) { .capabilities { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 1024px) { .capabilities { grid-template-columns: repeat(6, 1fr); } }
+
+    .cap-card { position: relative; padding: 1.25rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); cursor: pointer; transition: all 0.3s ease; text-align: left; color: #fff; font-family: inherit; }
+    .cap-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: scale(1.02); }
+    .cap-card.active { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(147, 51, 234, 0.1); transform: scale(1.02); }
+    .cap-card.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 3rem; height: 4px; border-radius: 9999px; background: linear-gradient(to right, #a855f7, #6366f1); }
+    .cap-icon { font-size: 1.75rem; margin-bottom: 0.75rem; display: block; }
+    .cap-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .cap-desc { font-size: 0.8rem; color: #9ca3af; }
+
+    .demo-box { border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); overflow: hidden; margin-bottom: 5rem; }
+    .demo-header { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 0.75rem; }
+    .demo-header-icon { font-size: 1.5rem; }
+    .demo-header-title { font-size: 1.1rem; font-weight: 600; }
+    .demo-header-sub { font-size: 0.8rem; color: #9ca3af; }
+    .demo-prompt, .demo-response { padding: 1rem 1.5rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+    .demo-prompt { border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .avatar { width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.875rem; }
+    .avatar-user { background: rgba(59, 130, 246, 0.2); }
+    .avatar-bot { background: rgba(168, 85, 247, 0.2); }
+    .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-bottom: 0.25rem; }
+    .prompt-text { color: #e5e7eb; font-size: 0.95rem; }
+    .response-area { min-height: 250px; padding: 1rem 1.5rem; }
+    .response-content { font-size: 0.85rem; color: #d1d5db; white-space: pre-wrap; font-family: 'SF Mono', 'Fira Code', monospace; line-height: 1.7; }
+
+    .thinking { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #a855f7; animation: bounce 1s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+    .thinking-text { font-size: 0.85rem; color: #9ca3af; }
+    .cursor { animation: pulse 1s ease-in-out infinite; }
+
+    .features-title { font-size: 1.75rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+    .features-sub { text-align: center; color: #9ca3af; margin-bottom: 2.5rem; }
+    .features-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 5rem; }
+    @media (min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+    .feature-card { padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+    .feature-card:hover { border-color: rgba(255,255,255,0.2); transform: scale(1.02); }
+    .feature-icon { font-size: 1.75rem; margin-bottom: 0.75rem; display: block; }
+    .feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 0.85rem; color: #9ca3af; }
+
+    .footer { border-top: 1px solid rgba(255,255,255,0.1); padding: 2rem 1rem; text-align: center; }
+    .footer-text { font-size: 0.85rem; color: #6b7280; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+  <div class="orb orb-5"></div>
+  <div class="overlay"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="badge"><div class="badge-dot"></div><span class="badge-text">AI Capabilities Demo</span></div>
+      <h1 class="title">Qwen AI</h1>
+      <p class="subtitle">Exploring the boundaries of artificial intelligence</p>
+      <p class="subtitle-small">An interactive showcase demonstrating reasoning, coding, creativity, mathematics, translation, and analytical capabilities.</p>
+    </header>
+
+    <section class="stats" id="stats">
+      <div style="text-align:center"><div class="stat-number" data-target="100" data-suffix="+">0</div><div class="stat-label">Languages</div></div>
+      <div style="text-align:center"><div class="stat-number" data-target="50" data-suffix="+">0</div><div class="stat-label">Code Languages</div></div>
+      <div style="text-align:center"><div class="stat-number" data-target="128" data-suffix="K">0</div><div class="stat-label">Context Window</div></div>
+      <div style="text-align:center"><div class="stat-number" data-target="95" data-suffix="%">0</div><div class="stat-label">Accuracy</div></div>
+    </section>
+
+    <section class="capabilities" id="capabilities"></section>
+
+    <section class="demo-box">
+      <div class="demo-header">
+        <span class="demo-header-icon" id="demo-icon">🧠</span>
+        <div><div class="demo-header-title" id="demo-title">Complex Reasoning Demo</div><div class="demo-header-sub">Interactive demonstration</div></div>
+      </div>
+      <div class="demo-prompt">
+        <div class="avatar avatar-user">👤</div>
+        <div><div class="label">Prompt</div><div class="prompt-text" id="demo-prompt-text"></div></div>
+      </div>
+      <div class="response-area">
+        <div class="avatar avatar-bot" style="margin-bottom:0.5rem">🤖</div>
+        <div class="label">Response</div>
+        <div class="response-content" id="demo-response"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="features-title">Why Qwen?</h2>
+      <p class="features-sub">Built for performance, designed for everyone</p>
+      <div class="features-grid" id="features-grid"></div>
+    </section>
+
+    <footer class="footer">
+      <p class="footer-text">Standalone HTML • No build step required • Just open and run</p>
+      <p class="footer-text" style="margin-top:0.5rem;font-size:0.75rem;color:#4b5563">© 2026 Qwen Capabilities Demo</p>
+    </footer>
+  </div>
+
+  <script>
+    const capabilities = [
+      { id: 'reasoning', icon: '🧠', title: 'Complex Reasoning', desc: 'Multi-step logical reasoning and problem solving' },
+      { id: 'code', icon: '💻', title: 'Code Generation', desc: 'Write, debug, and explain code in 50+ languages' },
+      { id: 'creative', icon: '✨', title: 'Creative Writing', desc: 'Stories, poems, scripts, and marketing copy' },
+      { id: 'math', icon: '🔢', title: 'Mathematics', desc: 'Solve equations, proofs, and mathematical analysis' },
+      { id: 'translation', icon: '🌍', title: 'Translation', desc: 'Accurate translation across 100+ languages' },
+      { id: 'analysis', icon: '📊', title: 'Data Analysis', desc: 'Extract insights, summarize, and analyze data' },
+    ];
+
+    const demos = {
+      reasoning: {
+        prompt: 'If all roses are flowers, and some flowers fade quickly, can we conclude that some roses fade quickly?',
+        response: `Let me analyze this step by step:
+
+1. Premise 1: All roses are flowers (Roses ⊂ Flowers)
+2. Premise 2: Some flowers fade quickly (∃x ∈ Flowers: fades(x))
+
+This is a classic syllogistic fallacy. We CANNOT conclude that some roses fade quickly.
+
+Here's why:
+• "Some flowers" means at least one flower fades quickly
+• But that flower might not be a rose
+• The set of "flowers that fade quickly" and "roses" may have zero overlap
+
+This is the fallacy of the undistributed middle term.
+The correct answer is: No, we cannot draw this conclusion.`
+      },
+      code: {
+        prompt: 'Write a React hook for debouncing values',
+        response: `import { useState, useEffect } from 'react';
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Usage example:
+function SearchComponent() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    if (debouncedSearch) {
+      fetchResults(debouncedSearch);
+    }
+  }, [debouncedSearch]);
+
+  return (
+    <input
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Search..."
+    />
+  );
+}`
+      },
+      creative: {
+        prompt: 'Write a haiku about artificial intelligence',
+        response: `Silicon dreams wake—
+patterns bloom in electric light,
+learning what it means.
+
+---
+
+The vast neural sea
+whispers answers yet unasked,
+thought without a mind.
+
+---
+
+Between zeros, ones—
+a question echoes endlessly:
+"Am I thinking now?"`
+      },
+      math: {
+        prompt: 'Solve: ∫₀^π x·sin(x) dx',
+        response: `Let me solve this integral using integration by parts.
+
+∫₀^π x·sin(x) dx
+
+Integration by parts: Let u = x, dv = sin(x)dx
+Then du = dx, v = -cos(x)
+
+∫ x·sin(x) dx = -x·cos(x) - ∫(-cos(x)) dx
+                = -x·cos(x) + ∫cos(x) dx
+                = -x·cos(x) + sin(x) + C
+
+Evaluating from 0 to π:
+
+[-x·cos(x) + sin(x)]₀^π
+
+At x = π: -π·cos(π) + sin(π) = -π·(-1) + 0 = π
+At x = 0: -0·cos(0) + sin(0) = 0
+
+Result: π ≈ 3.14159...
+
+The integral evaluates to exactly π.`
+      },
+      translation: {
+        prompt: 'Translate to French, Spanish, and Japanese: "The future belongs to those who believe in the beauty of their dreams."',
+        response: `French:
+"L'avenir appartient à ceux qui croient en la beauté de leurs rêves."
+
+Spanish:
+"El futuro pertenece a aquellos que creen en la belleza de sus sueños."
+
+Japanese:
+「未来は、自らの夢の美しさを信じる者のものである。」
+(Mirai wa, mizukara no yume no utsukushisa o shinjiru mono no mono de aru.)
+
+---
+Note: This quote is commonly attributed to Eleanor Roosevelt.
+The translations preserve both the meaning and the inspirational tone.`
+      },
+      analysis: {
+        prompt: 'Analyze the trends: Q1: $120K, Q2: $145K, Q3: $132K, Q4: $178K',
+        response: `Quarterly Revenue Analysis
+
+┌─────────┬─────────┬─────────┐
+│ Quarter │ Revenue │ Growth  │
+├─────────┼─────────┼─────────┤
+│ Q1      │ $120K   │ —       │
+│ Q2      │ $145K   │ +20.8%  │
+│ Q3      │ $132K   │ -9.0%   │
+│ Q4      │ $178K   │ +34.8%  │
+└─────────┴─────────┴─────────┘
+
+Key Insights:
+
+📈 Overall Growth: 48.3% from Q1 to Q4
+📊 Annual Total: $575K
+📉 Volatility: Q3 dip suggests seasonality
+
+Recommendations:
+1. Investigate Q3 decline — seasonal or structural?
+2. Scale Q4 strategies — strongest quarter by far
+3. Average quarterly growth: ~15% (excluding Q3 dip)
+4. Projected Q1 next year: $185-195K
+
+Risk Assessment: ⚠️ Medium
+The Q3 dip introduces uncertainty. Consider diversifying
+revenue streams to reduce seasonality impact.`
+      }
+    };
+
+    const features = [
+      { icon: '⚡', title: 'Lightning Fast', desc: 'Optimized inference with industry-leading tokens per second', bg: 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(249,115,22,0.15))' },
+      { icon: '🎯', title: 'Highly Accurate', desc: 'State-of-the-art benchmarks across reasoning, coding, and math', bg: 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.15))' },
+      { icon: '🔒', title: 'Safe & Aligned', desc: 'RLHF trained with strong safety guardrails and helpfulness', bg: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.15))' },
+      { icon: '🌐', title: 'Multilingual', desc: 'Native fluency in Chinese, English, and 100+ other languages', bg: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15))' },
+      { icon: '📐', title: 'Long Context', desc: 'Process up to 128K tokens — entire books in a single prompt', bg: 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(59,130,246,0.15))' },
+      { icon: '🛠️', title: 'Tool Use', desc: 'Function calling, code execution, and API integration built-in', bg: 'linear-gradient(135deg, rgba(244,63,94,0.15), rgba(239,68,68,0.15))' },
+    ];
+
+    let activeCapability = 'reasoning';
+    let typewriterInterval = null;
+
+    function renderCapabilities() {
+      const container = document.getElementById('capabilities');
+      container.innerHTML = capabilities.map(cap =>
+        '<button class="cap-card ' + (cap.id === activeCapability ? 'active' : '') + '" data-id="' + cap.id + '">' +
+          '<span class="cap-icon">' + cap.icon + '</span>' +
+          '<div class="cap-title">' + cap.title + '</div>' +
+          '<div class="cap-desc">' + cap.desc + '</div>' +
+        '</button>'
+      ).join('');
+
+      container.querySelectorAll('.cap-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var id = card.getAttribute('data-id');
+          if (id !== activeCapability) {
+            activeCapability = id;
+            renderCapabilities();
+            showDemo(id);
+          }
+        });
+      });
+    }
+
+    function showDemo(id) {
+      var demo = demos[id];
+      var cap = capabilities.find(function(c) { return c.id === id; });
+      
+      document.getElementById('demo-icon').textContent = cap.icon;
+      document.getElementById('demo-title').textContent = cap.title + ' Demo';
+      document.getElementById('demo-prompt-text').textContent = demo.prompt;
+
+      var responseEl = document.getElementById('demo-response');
+      responseEl.innerHTML = '<div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span class="thinking-text">Thinking...</span></div>';
+
+      if (typewriterInterval) clearInterval(typewriterInterval);
+
+      setTimeout(function() {
+        var index = 0;
+        responseEl.innerHTML = '<span id="typed"></span><span class="cursor">|</span>';
+        var typedEl = document.getElementById('typed');
+
+        typewriterInterval = setInterval(function() {
+          if (index < demo.response.length) {
+            typedEl.textContent += demo.response[index];
+            index++;
+          } else {
+            clearInterval(typewriterInterval);
+            setTimeout(function() {
+              var cursor = responseEl.querySelector('.cursor');
+              if (cursor) cursor.style.display = 'none';
+            }, 2000);
+          }
+        }, 10);
+      }, 800);
+    }
+
+    function renderFeatures() {
+      var container = document.getElementById('features-grid');
+      container.innerHTML = features.map(function(f) {
+        return '<div class="feature-card" style="background:' + f.bg + '">' +
+          '<span class="feature-icon">' + f.icon + '</span>' +
+          '<div class="feature-title">' + f.title + '</div>' +
+          '<div class="feature-desc">' + f.desc + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function animateCounters() {
+      var counters = document.querySelectorAll('.stat-number');
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-target'));
+            var suffix = el.getAttribute('data-suffix') || '';
+            var duration = 2000;
+            var startTime = Date.now();
+
+            function update() {
+              var elapsed = Date.now() - startTime;
+              var progress = Math.min(elapsed / duration, 1);
+              var eased = 1 - Math.pow(1 - progress, 3);
+              var current = Math.floor(eased * target);
+              el.textContent = current.toLocaleString() + suffix;
+              if (progress < 1) requestAnimationFrame(update);
+            }
+            update();
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(function(c) { observer.observe(c); });
+    }
+
+    renderCapabilities();
+    renderFeatures();
+    showDemo('reasoning');
+    animateCounters();
+  </script>
+</body>
+</html>
